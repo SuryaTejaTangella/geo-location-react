@@ -1,70 +1,180 @@
-# Getting Started with Create React App
+# 📍 React Custom Hook – useGeolocation
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 🚀 Overview
 
-## Available Scripts
+This project demonstrates how to build and use a **custom React hook** called `useGeolocation` to fetch the user’s current GPS location using the browser’s Geolocation API.
 
-In the project directory, you can run:
+It showcases:
 
-### `npm start`
+* Custom hook creation
+* State management using React Hooks
+* Handling asynchronous browser APIs
+* Error handling and loading states
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🧠 What is `useGeolocation`?
 
-### `npm test`
+`useGeolocation` is a reusable custom hook that:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* Fetches the user's current latitude and longitude
+* Tracks loading state while fetching location
+* Handles errors (e.g., permission denied, unsupported browser)
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## ⚙️ Features
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+* 📍 Get real-time user location (latitude & longitude)
+* ⏳ Loading indicator while fetching data
+* ❌ Graceful error handling
+* 🔁 Tracks number of location requests
+* 🔗 Direct link to OpenStreetMap for visualization
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## 🏗️ Project Structure
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```
+.
+├── App.js
+├── useGeolocation (custom hook inside App.js)
+└── README.md
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🔧 How It Works
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 1. Custom Hook Logic
 
-## Learn More
+The hook uses:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+* `useState` for managing:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+  * `isLoading`
+  * `position`
+  * `error`
+* `navigator.geolocation.getCurrentPosition()` to fetch location
 
-### Code Splitting
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 2. API Flow
 
-### Analyzing the Bundle Size
+1. User clicks **"Get my position"**
+2. Hook triggers geolocation request
+3. Browser asks for permission
+4. On success:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+   * Latitude & longitude are stored
+5. On failure:
 
-### Making a Progressive Web App
+   * Error message is displayed
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 🧩 Code Example (Core Hook)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```js
+function useGeolocation() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [position, setPosition] = useState({});
+  const [error, setError] = useState(null);
 
-### Deployment
+  function getPosition() {
+    if (!navigator.geolocation)
+      return setError("Your browser does not support geolocation");
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+    setIsLoading(true);
 
-### `npm run build` fails to minify
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setPosition({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+        setIsLoading(false);
+      },
+      (error) => {
+        setError(error.message);
+        setIsLoading(false);
+      }
+    );
+  }
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+  return { isLoading, position, error, getPosition };
+}
+```
+
+---
+
+## 🖥️ UI Behavior
+
+* Button triggers location fetch
+* Displays:
+
+  * Loading state
+  * Error message (if any)
+  * Latitude & longitude (with map link)
+* Tracks how many times user requested location
+
+---
+
+## 🔗 Example Output
+
+```
+Your GPS position: 16.5062, 80.6480
+```
+
+(Clickable link opens location in OpenStreetMap)
+
+---
+
+## 📚 Concepts Covered
+
+* Custom React Hooks
+* `useState`
+* Asynchronous JavaScript
+* Browser APIs (Geolocation)
+* Conditional rendering
+* Clean separation of logic and UI
+
+---
+
+## ⚠️ Important Notes
+
+* Requires user permission for location access
+* Works only in secure contexts (HTTPS)
+* May not work in older browsers
+
+---
+
+## 🚀 Future Improvements
+
+* Add `useEffect` to auto-fetch location
+* Add caching of last location
+* Add map preview (Google Maps / Leaflet)
+* Add debounce/throttle for repeated clicks
+
+---
+
+## 🎯 Learning Outcome
+
+After this project, you should understand:
+
+* How to create reusable logic using custom hooks
+* How to handle real-world async operations in React
+* How to separate concerns between UI and logic
+
+---
+
+## 👨‍💻 Author
+Surya Teja Tangella
+
+Built as part of React learning journey focusing on:
+
+* Hooks
+* Real-world APIs
+* Clean architecture
+
+---
